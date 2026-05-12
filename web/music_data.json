@@ -1,0 +1,26 @@
+[
+  {
+    "model": "django_music.artist",
+    "pk": 1,
+    "fields": { "name": "The Weeknd" }
+  },
+  {
+    "model": "django_music.album",
+    "pk": 1,
+    "fields": { "title": "After Hours", "artist": 1 }
+  },
+  {
+    "model": "django_music.song",
+    "pk": 1,
+    "fields": { "title": "Blinding Lights", "album": 1, "artist": 1 }
+  },
+  {
+    "model": "django_music.userprofile",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "slug": "michael",
+      "favorite_song": 1
+    }
+  }
+]

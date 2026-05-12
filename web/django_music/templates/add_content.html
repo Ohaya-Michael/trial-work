@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 520px;">
+
+  <!-- Tab switcher -->
+  <div class="d-flex gap-2 mb-4">
+    <a href="{% url 'add-song' %}"
+       class="btn btn-sm {% if title == 'Add Song' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      Song
+    </a>
+    <a href="{% url 'add-album' %}"
+       class="btn btn-sm {% if title == 'Add Album' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      Album
+    </a>
+    <a href="{% url 'add-artist' %}"
+       class="btn btn-sm {% if title == 'Add Artist' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      Artist
+    </a>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 p-4">
+    <h4 class="fw-bold mb-4">{{ title }}</h4>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-medium">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary w-100 mt-2">Save</button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

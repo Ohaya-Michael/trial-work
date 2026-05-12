@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center justify-content-center" style="min-height: 70vh;">
+        
+        <!-- Left Column: Why join us? -->
+        <div class="col-lg-5 col-md-6 mb-4 mb-md-0">
+            <h2 class="display-6 fw-bold mb-4">Welcome Back!</h2>
+            <p class="text-muted mb-4">Top songs from your favorite artists.</p>
+            
+            <ul class="list-group list-group-flush shadow-sm rounded">
+                {% for item in features %}
+                    <li class="list-group-item d-flex align-items-center py-3">
+                        <i class="bi bi-check-circle-fill text-success me-3 fs-5"></i> 
+                        <span class="fw-medium text-secondary">{{ item }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">More features coming soon...</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Right Column: Login Card -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-4 p-sm-5">
+                    <h3 class="text-center fw-bold mb-4">Login</h3>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small text-uppercase text-muted">{{ field.label }}</label>
+                                {# Note: Ensure you use 'widget_tweaks' or a form init to add 'form-control' class #}
+                                {{ field }}
+                                
+                                {% if field.help_text %}
+                                    <div class="form-text small">{{ field.help_text }}</div>
+                                {% endif %}
+                                
+                                {% for error in field.errors %}
+                                    <div class="text-danger x-small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mt-3 shadow-sm">
+                            Sign In
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

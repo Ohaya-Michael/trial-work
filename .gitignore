@@ -1,0 +1,14 @@
+__pycache__/
+htdocs/
+
+.venv
+*.sqlite3
+*.sqlite3
+web/static
+
+*.iml
+.idea/
+node_modules/
+django_venv/
+dist/
+

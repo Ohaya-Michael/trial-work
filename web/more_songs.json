@@ -1,0 +1,22 @@
+[
+  {
+    "model": "django_music.song",
+    "pk": 10,
+    "fields": { "title": "Starboy", "album": 1, "artist": 1 }
+  },
+  {
+    "model": "django_music.song",
+    "pk": 11,
+    "fields": { "title": "Die For You", "artist": 1, "album": 1 }
+  },
+  {
+    "model": "django_music.song",
+    "pk": 12,
+    "fields": { "title": "Creepin'", "artist": 1, "album": 1 }
+  },
+  {
+    "model": "django_music.song",
+    "pk": 13,
+    "fields": { "title": "Heartless", "artist": 1, "album": 1 }
+  }
+]
