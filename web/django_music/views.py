@@ -51,19 +51,6 @@ class MyLoginView(LoginView):
         return reverse('public_profile', kwargs={'user_slug': self.request.user.username})
 
 
-# class PublicProfileView(TemplateView):
-#     template_name = 'public_profile.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         # Suche nach 'slug', um den FieldError zu vermeiden
-#         profile = get_object_or_404(UserProfile, slug=self.kwargs.get('user_slug'))
-
-#         context['user_profile'] = profile
-#         # Wir holen beispielhaft die ersten 5 Songs aus der Datenbank
-#         from .models import Song
-#         context['top_songs'] = Song.objects.filter(artist=profile.favorite_song.artist)[:5]
-#         return context
 class PublicProfileView(TemplateView):
     template_name = 'public_profile.html'
 
