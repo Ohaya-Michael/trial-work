@@ -30,6 +30,20 @@
         </div>
         <h1 class="display-5 fw-bold text-dark mb-1">@{{ user_profile.slug }}</h1>
         <p class="lead text-muted fs-6">Music Enthusiast</p>
+        <!-- Add search functionality -->
+        <form method="get" action="{% url 'public_profile' user_profile.slug %}" class="d-flex justify-content-center mt-4">
+            <input type="text" 
+            name="q" 
+            class="form-control w-50 me-2" 
+            placeholder="Search songs..." 
+            value="{{ search_query|default:'' }}">
+            <button 
+            type="submit" 
+            class="btn btn-outline-primary"
+            >
+                Search
+            </button>
+        </form>
     </div>
 
     <!-- Song-Bereich -->
