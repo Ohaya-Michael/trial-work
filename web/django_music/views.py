@@ -1,10 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import get_object_or_404
 from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
+from django.views.generic import CreateView
+from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib.auth import logout
 from django.shortcuts import redirect
@@ -38,13 +42,22 @@ class HelloWorldView(LoginRequiredMixin, TemplateView):
     template_name = 'hello_world.html'
 
 
+
+class MyRegisterView(CreateView):
+    model = User
+    form_class = UserCreationForm
+    template_name = 'register.html'
+    success_url = reverse_lazy('login')
+
+
+
 class MyLoginView(LoginView):
     template_name = 'login.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Add your list items here
-        context['features'] = Song.objects.all()  # Beispiel: die ersten 5 Songs aus der Datenbank
+        context['features'] = Song.objects.all() 
         return context
     
     def get_success_url(self):
@@ -58,22 +71,28 @@ class PublicProfileView(TemplateView):
         context = super().get_context_data(**kwargs)
         
         # Profil laden
-        profile = get_object_or_404(UserProfile, slug=self.kwargs.get('user_slug'))
+        try:
+            profile = UserProfile.objects.get(slug=self.kwargs.get('user_slug'))
+        except UserProfile.DoesNotExist:
+            # If the missing profile belongs to the logged-in user, create it on the fly
+            if self.request.user.is_authenticated and self.request.user.username == self.kwargs.get('user_slug'):
+                profile = UserProfile.objects.create(user=self.request.user, slug=self.request.user.username)
+            else:
+                raise Http404("No UserProfile matches the given query.")
         context['user_profile'] = profile
 
-        # Basis-Queryset für die Songs dieses Profils
-        songs_queryset = Song.objects.filter(artist=profile.favorite_song.artist)
+        if profile.favorite_song and profile.favorite_song.artist:
+            songs_queryset = Song.objects.filter(artist=profile.favorite_song.artist)
+        else:
+            songs_queryset = Song.objects.none()
 
-        # Suchbegriff aus der URL abfangen (?q=suchbegriff)
         search_query = self.request.GET.get('q', '').strip()
         
         if search_query:
-            # Filtert, wenn der Suchbegriff im Songtitel ODER Künstlernamen vorkommt (case-insensitive)
             songs_queryset = songs_queryset.filter(
                 Q(title__icontains=search_query) | 
                 Q(artist__name__icontains=search_query)
             )
-            # Suchbegriff im Kontext speichern, um ihn im Suchfeld anzuzeigen
             context['search_query'] = search_query
 
         # Die gefilterten Top 5 Songs an das Template übergeben
