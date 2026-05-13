@@ -18,11 +18,21 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from django_music.views import AddAlbumView, AddArtistView, AddSongView, GlobalLogoutView, MyLoginView, PublicProfileView, SongDetailView
+from django_music.views import (
+    AddAlbumView, 
+    AddArtistView, 
+    AddSongView, 
+    GlobalLogoutView, 
+    MyLoginView, 
+    MyRegisterView, 
+    PublicProfileView, 
+    SongDetailView
+    )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', MyLoginView.as_view(), name='login'),
+    path('register/', MyRegisterView.as_view(), name='register'),
     path('logout/', GlobalLogoutView.as_view(), name='logout'),
     path('add/song/',   AddSongView.as_view(),   name='add-song'),
     path('add/album/',  AddAlbumView.as_view(),  name='add-album'),
