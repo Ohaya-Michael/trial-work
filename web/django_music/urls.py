@@ -21,12 +21,15 @@ from django.contrib.auth import views as auth_views
 from django_music.views import (
     AddAlbumView, 
     AddArtistView, 
-    AddSongView, 
+    AddSongView,
+    EditSongView, 
     GlobalLogoutView, 
     MyLoginView, 
     MyRegisterView, 
     PublicProfileView, 
-    SongDetailView
+    SongDetailView,
+    RateSongView,
+    UpdateView
     )
 
 urlpatterns = [
@@ -37,6 +40,9 @@ urlpatterns = [
     path('add/song/',   AddSongView.as_view(),   name='add-song'),
     path('add/album/',  AddAlbumView.as_view(),  name='add-album'),
     path('add/artist/', AddArtistView.as_view(), name='add-artist'),
+    path('rate/song/<slug:slug>/', RateSongView.as_view(), name='rate-song'),
+    path('edit/song/<slug:slug>/', EditSongView.as_view(), name='edit-song'),
+    path('add/to/favorites/<slug:slug>/', UpdateView.as_view(), name='add-to-favorites'),
     path('profile/<str:user_slug>/', PublicProfileView.as_view(), name='public_profile'),
     path('songs/<slug:slug>/', SongDetailView.as_view(), name='song-detail-view'),
 ]

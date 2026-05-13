@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .song-hero {
+    border-radius: 16px;
+    padding: 2.5rem;
+    transition: background 0.5s ease;
+  }
+  .cover-img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="song-hero d-flex align-items-center gap-4" id="hero">
+    <img
+      id="cover"
+      src="{{ song.album.cover.url }}"
+      alt="{{ song.album.title }}"
+      class="cover-img"
+      crossorigin="anonymous"
+    >
+    <div>
+      <h1 class="fw-bold mb-1" id="title">{{ song.title }}</h1>
+      <p class="mb-1 fs-5" id="artist">{{ song.artist.name }}</p>
+      <p class="mb-0 text-muted">{{ song.album.title }}</p>
+      <div class="d-flex gap-2 mt-3">
+        <a href="{% url 'edit-song' song.slug %}">
+          <button class="btn btn-primary mt-3">
+            Edit Song
+          </button>
+        </a>
+        <a href="{% url 'add-to-favorites' song.slug %}">
+          <button class="btn btn-primary mt-3">
+            Add Song to Favorites
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+<script>
+  const img = document.getElementById('cover');
+
+  function applyPalette() {
+    const thief = new ColorThief();
+    const [r, g, b] = thief.getColor(img);
+    const [r2, g2, b2] = thief.getPalette(img, 5)[2];
+
+    document.getElementById('hero').style.background = `linear-gradient(135deg, rgb(${r},${g},${b},0.15), rgb(${r2},${g2},${b2},0.25))`;
+    document.getElementById('title').style.color = `rgb(${r},${g},${b})`;
+    document.getElementById('artist').style.color = `rgb(${r2},${g2},${b2})`;
+  }
+
+  img.complete ? applyPalette() : img.addEventListener('load', applyPalette);
+</script>
+{% endblock %}

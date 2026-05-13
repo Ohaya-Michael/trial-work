@@ -3,6 +3,9 @@ from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
+from django.views.generic.edit import UpdateView
+    
+from django.views import View
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import get_object_or_404
 from django.contrib.sessions.models import Session
@@ -15,8 +18,8 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from django.db.models import Q 
 
-from .models import UserProfile, Song, Album, Artist
-from .forms import SongForm, AlbumForm, ArtistForm
+from .models import UserProfile, Song, Album, Artist, SongRating
+from .forms import SongForm, AlbumForm, ArtistForm, RatingForm
 
 
 class GlobalLogoutView(LogoutView):
@@ -38,17 +41,11 @@ class GlobalLogoutView(LogoutView):
         return redirect('login')
 
 
-class HelloWorldView(LoginRequiredMixin, TemplateView):
-    template_name = 'hello_world.html'
-
-
-
 class MyRegisterView(CreateView):
     model = User
     form_class = UserCreationForm
     template_name = 'register.html'
     success_url = reverse_lazy('login')
-
 
 
 class MyLoginView(LoginView):
@@ -99,7 +96,8 @@ class PublicProfileView(TemplateView):
         context['top_songs'] = songs_queryset[:5]
         return context
 
-class SongDetailView(TemplateView):
+
+class SongDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'song_detail.html'
 
     def get_object(self):
@@ -114,6 +112,30 @@ class SongDetailView(TemplateView):
         return context
 
 
+class RateSongView(LoginRequiredMixin, View):
+    def post(self, request, slug):
+        song = get_object_or_404(Song, slug=slug)
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            SongRating.objects.update_or_create(
+                song=song,
+                user=request.user,
+                defaults={'score': form.cleaned_data['score']}
+            )
+        return redirect('song-detail-view', slug=slug)
+
+
+class EditSongView(LoginRequiredMixin, UpdateView):
+    model = Song
+    form_class = SongForm
+    template_name = 'edit_song.html'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def get_success_url(self):
+        return reverse_lazy('song-detail-view', kwargs={'slug': self.object.slug})
+
+
 class AddSongView(LoginRequiredMixin, CreateView):
     model = Song
     form_class = SongForm
@@ -124,6 +146,7 @@ class AddSongView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Add Song'
         return context
+
 
 class AddAlbumView(LoginRequiredMixin, CreateView):
     model = Album

@@ -1,55 +1,61 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<style>
-  .song-hero {
-    border-radius: 16px;
-    padding: 2.5rem;
-    transition: background 0.5s ease;
-  }
-  .cover-img {
-    width: 180px;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-  }
-</style>
-
 <div class="container mt-5">
   <div class="song-hero d-flex align-items-center gap-4" id="hero">
-    <img
-      id="cover"
-      src="{{ song.album.cover.url }}"
-      alt="{{ song.album.title }}"
-      class="cover-img"
-      crossorigin="anonymous"
-    >
+    <img id="cover" src="{{ song.album.cover.url }}" class="cover-img" crossorigin="anonymous">
     <div>
       <h1 class="fw-bold mb-1" id="title">{{ song.title }}</h1>
       <p class="mb-1 fs-5" id="artist">{{ song.artist.name }}</p>
-      <p class="mb-0 text-muted">{{ song.album.title }}</p>
+      <p class="mb-3 text-muted">{{ song.album.title }}</p>
+
+      <!-- Average rating display -->
+      <div class="mb-3">
+        {% with avg=song.average_rating %}
+          {% if avg %}
+            <span class="fs-4 fw-bold">{{ avg }}</span>
+            <span class="text-muted">/10</span>
+            <span class="text-muted ms-2 small">({{ song.ratings.count }} rating{{ song.ratings.count|pluralize }})</span>
+          {% else %}
+            <span class="text-muted small">No ratings yet</span>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- Rating form -->
+      {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'rate-song' song.slug %}" class="d-flex align-items-center gap-2">
+          {% csrf_token %}
+          <label class="form-label mb-0 fw-medium">
+          {% if user_rating %}Your rating:{% else %}Rate this song:{% endif %}          
+          </label>
+          <input
+            type="number"
+            name="score"
+            min="1"
+            max="10"
+            value="{{ user_rating|default:'' }}"
+            class="form-control"
+            style="max-width: 75px;"
+          >
+          <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+        </form>
+        {% with user_score=song.user_rating %}
+          {% if user_score %}
+            <p class="text-muted small mt-1">Your current rating: {{ user_score }}/10</p>
+          {% endif %}
+        {% endwith %}
+      {% else %}
+        <p class="text-muted small"><a href="{% url 'login' %}">Log in</a> to rate this song.</p>
+      {% endif %}
+
+      <!-- Existing buttons -->
+      <div class="d-flex gap-2 mt-3">
+        {% if user.is_authenticated %}
+          <a href="{% url 'edit-song' song.slug %}" class="btn btn-primary btn-sm">Edit Song</a>
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
-<script>
-  const img = document.getElementById('cover');
-
-  function applyPalette() {
-    const thief = new ColorThief();
-    const [r, g, b] = thief.getColor(img);
-    const [r2, g2, b2] = thief.getPalette(img, 5)[2];
-
-    document.getElementById('hero').style.background =
-      `linear-gradient(135deg, rgb(${r},${g},${b},0.15), rgb(${r2},${g2},${b2},0.25))`;
-    document.getElementById('title').style.color =
-      `rgb(${r},${g},${b})`;
-    document.getElementById('artist').style.color =
-      `rgb(${r2},${g2},${b2})`;
-  }
-
-  img.complete ? applyPalette() : img.addEventListener('load', applyPalette);
-</script>
 {% endblock %}

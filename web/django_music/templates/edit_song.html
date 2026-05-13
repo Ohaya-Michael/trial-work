@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 520px;">
+
+  <div class="d-flex align-items-center gap-3 mb-4">
+    {% if song.album.cover %}
+      <img src="{{ song.album.cover.url }}" alt="{{ song.album.title }}"
+           style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+    {% endif %}
+    <div>
+      <h4 class="fw-bold mb-0">Edit Song</h4>
+      <p class="text-muted mb-0 small">{{ song.title }}</p>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-3 p-4">
+    <form method="POST">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-medium">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-primary flex-grow-1">Save Changes</button>
+        <a href="{% url 'song-detail-view' song.slug %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
